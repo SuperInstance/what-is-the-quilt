@@ -29,16 +29,26 @@ A record is `{id, parents, kind, effects, reason}` plus an optional `digest` cla
 
 The fold doesn't trust any service in the write path. The runner refuses malformed records; the worker collects them; the fold derives the state. State is *never* stored, only ever derived. The cache is a derived artefact; the record is the truth.
 
-### 4. Three ports, one algorithm
+### 4. Six ports, one algorithm (30/30 byte-for-byte equivalent)
 
 The fold is implemented in:
 
-- **TypeScript** ([`patchwork-quilt/git.pp-ng`](https://github.com/patchwork-quilt/git.pp-ng)) — the canonical port, with the Cloudflare Workers + Artifacts runtime
-- **Python** (the referee, in `git.pp-ng/referee/`) — the portable reference implementation
+- **TypeScript** ([`patchwork-quilt/git.pp-ng`](https://github.com/patchwork-quilt/git.pp-ng)) — the canonical port, the hub, in production
+- **Python** (the referee, in `git.pp-ng/referee/`) — the portable reference implementation, the byte-level oracle
 - **Elixir** ([`patchwork-quilt/gitpp-beam`](https://github.com/patchwork-quilt/gitpp-beam)) — GenServer per project, burn/restart-safe
-- **Rust** ([`SuperInstance/gitpp-rust`](https://github.com/SuperInstance/gitpp-rust)) — the 4th port, in progress
+- **JavaScript** ([`SuperInstance/gitpp-js`](https://github.com/SuperInstance/gitpp-js)) — 4th port, pure ESM, runs in any modern browser or Node 18+
+- **C# / .NET 9** ([`SuperInstance/gitpp-cs`](https://github.com/SuperInstance/gitpp-cs)) — 5th port, stdlib only, AOT-compilable, Azure-Functions-friendly
+- **Perl 5** ([`SuperInstance/gitpp-pl`](https://github.com/SuperInstance/gitpp-pl)) — 6th port, stdlib only, 4-byte UTF-8 handled natively (the rocket emoji 🚀)
 
-All three (and the in-progress fourth) follow the same doc-only-discipline: written from the public spec, not from each other's source. A port that reproduces the pinned digests from the spec alone proves the spec is complete.
+Plus one scaffolded:
+
+- **Rust** ([`SuperInstance/gitpp-rust`](https://github.com/SuperInstance/gitpp-rust)) — awaiting cargo in a future session
+
+All 5 active ports (TS, Python, Elixir, JS, C#, Perl) follow the same **doc-only discipline**: written from the public spec, not from each other's source. A port that reproduces the pinned digests from the spec alone proves the spec is complete.
+
+The cross-port artifact at [SuperInstance/gitpp-cross-port](https://github.com/SuperInstance/gitpp-cross-port) runs the same 30 cases through the 4 doc-only ports (Python, JS, C#, Perl) and proves they produce byte-for-byte identical closure roots. **30/30 cases agree. 4/4 pinned leaves match. 0 disagreements.**
+
+The cross-port byte-equivalence is the strongest possible conformance test: if two ports written from prose alone agree on every byte of every leaf, the spec is normative, not a tutorial.
 
 ### 5. The corpus is the receipt
 
