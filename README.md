@@ -12,7 +12,7 @@ The Quilt is a multi-repo project family that builds a **git substrate where the
 
 ### 1. The fold is the heart
 
-A pure function `derive(records) → state`. Three ports (TypeScript, Python, Elixir) and one in progress (Rust) all pass the same 1,151-case conformance corpus with byte-identical digests. The fold is mechanical: class precedence is absolute (`override > task > witness`), within a class the most-derived candidate wins, remaining ties break by ancestor depth and id.
+A pure function `derive(records) → state`. Three production ports (TypeScript, Python, Elixir) pass the same 1,151-case conformance corpus; four more ports (JS, C#, Perl, C99) are fold-complete and pass a 28-case public corpus. The Rust port is scaffolded. The fold is mechanical: class precedence is absolute (`override > task > witness`), within a class the most-derived candidate wins, remaining ties break by ancestor depth and id.
 
 ```ts
 // Three ports. Same input. Same bytes out.
@@ -29,9 +29,9 @@ A record is `{id, parents, kind, effects, reason}` plus an optional `digest` cla
 
 The fold doesn't trust any service in the write path. The runner refuses malformed records; the worker collects them; the fold derives the state. State is *never* stored, only ever derived. The cache is a derived artefact; the record is the truth.
 
-### 4. Six ports, one algorithm (30/30 byte-for-byte equivalent)
+### 4. Seven ports, one algorithm (500/500 cross-port fuzz)
 
-The fold is implemented in:
+The fold is implemented in seven languages:
 
 - **TypeScript** ([`patchwork-quilt/git.pp-ng`](https://github.com/patchwork-quilt/git.pp-ng)) — the canonical port, the hub, in production
 - **Python** (the referee, in `git.pp-ng/referee/`) — the portable reference implementation, the byte-level oracle
@@ -39,14 +39,20 @@ The fold is implemented in:
 - **JavaScript** ([`SuperInstance/gitpp-js`](https://github.com/SuperInstance/gitpp-js)) — 4th port, pure ESM, runs in any modern browser or Node 18+
 - **C# / .NET 9** ([`SuperInstance/gitpp-cs`](https://github.com/SuperInstance/gitpp-cs)) — 5th port, stdlib only, AOT-compilable, Azure-Functions-friendly
 - **Perl 5** ([`SuperInstance/gitpp-pl`](https://github.com/SuperInstance/gitpp-pl)) — 6th port, stdlib only, 4-byte UTF-8 handled natively (the rocket emoji 🚀)
+- **C99** ([`SuperInstance/gitpp-c`](https://github.com/SuperInstance/gitpp-c)) — 7th port, stdlib only, manual SHA-256, manual memory. The most pedantic test of the spec.
 
 Plus one scaffolded:
 
 - **Rust** ([`SuperInstance/gitpp-rust`](https://github.com/SuperInstance/gitpp-rust)) — awaiting cargo in a future session
 
-All 5 active ports (TS, Python, Elixir, JS, C#, Perl) follow the same **doc-only discipline**: written from the public spec, not from each other's source. A port that reproduces the pinned digests from the spec alone proves the spec is complete.
+**Cross-port fuzz test:** all 5 fold ports (Python, JS, C, C#, Perl) produce
+**byte-identical SHA-256 leaves** on 500/500 random float64 records.
+The 17,004-record full corpus is in progress. Fuzz runner is at
+[`SuperInstance/gitpp-cross-port/fuzz.mjs`](https://github.com/SuperInstance/gitpp-cross-port/blob/main/fuzz.mjs).
 
-The cross-port artifact at [SuperInstance/gitpp-cross-port](https://github.com/SuperInstance/gitpp-cross-port) runs the same 30 cases through the 4 doc-only ports (Python, JS, C#, Perl) and proves they produce byte-for-byte identical closure roots. **30/30 cases agree. 4/4 pinned leaves match. 0 disagreements.**
+The cross-port artifact also runs the 30 canonical cases through
+the doc-only ports and proves they produce byte-for-byte identical
+closure roots. **30/30 cases agree. 4/4 pinned leaves match. 0 disagreements.**
 
 The cross-port byte-equivalence is the strongest possible conformance test: if two ports written from prose alone agree on every byte of every leaf, the spec is normative, not a tutorial.
 
@@ -120,7 +126,7 @@ The first law makes the system durable and auditable. The second makes it honest
 - **Not a chat.** The Quilt is a substrate for any agent that can write a record; the chat interface is one of many possible views.
 - **Not a wrapper around git.** The Quilt projects git as a substrate — every record is a commit, every derived state is a fold, but the underlying git operations are unchanged. You can `git log` the history.
 - **Not a blockchain.** A blockchain distributes trust; the Quilt concentrates it in the record and the fold.
-- **Not done.** The §6 doctrine question is open (see below); the Rust port is in progress; the audit/gate/ledger/ship-gate stack needs broader validation; the public deployment is one project with 8 records.
+- **Not done.** The §6 doctrine is decided (captain-call, Option II); the Rust port is scaffolded; the audit/gate/ledger/ship-gate stack needs broader validation; the public deployment is one project with 8 records; the cross-port fuzz is at 500/500 (full 17k corpus in progress).
 
 ## The open design questions
 
