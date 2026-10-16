@@ -46,8 +46,9 @@ Plus one scaffolded:
 - **Rust** ([`SuperInstance/gitpp-rust`](https://github.com/SuperInstance/gitpp-rust)) — awaiting cargo in a future session
 
 **Cross-port fuzz test:** all 5 fold ports (Python, JS, C, C#, Perl) produce
-**byte-identical SHA-256 leaves** on 500/500 random float64 records.
-The 17,004-record full corpus is in progress. Fuzz runner is at
+**byte-identical SHA-256 leaves** on 1000/1000 random float64 records.
+The 17,004-record full corpus is in progress in the background.
+Fuzz runner is at
 [`SuperInstance/gitpp-cross-port/fuzz.mjs`](https://github.com/SuperInstance/gitpp-cross-port/blob/main/fuzz.mjs).
 
 The cross-port artifact also runs the 30 canonical cases through
